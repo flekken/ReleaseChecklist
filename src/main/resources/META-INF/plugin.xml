@@ -23,7 +23,7 @@
     <depends optional="false">Git4Idea</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <!-- Add your extensions here -->
+        <toolWindow id="Release Checklist" anchor="right" factoryClass="flekken.releasechecklist.ui.ToolWindow"/>
     </extensions>
 
     <!-- DEFAULT ENTRY POINT -->
