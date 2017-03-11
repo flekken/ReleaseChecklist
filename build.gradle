@@ -1,0 +1,28 @@
+buildscript {
+    repositories {
+        maven { url 'http://dl.bintray.com/jetbrains/intellij-plugin-service' }
+    }
+}
+
+plugins {
+    id "org.jetbrains.intellij" version "0.2.0"
+}
+
+apply plugin: 'java'
+compileJava {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+}
+
+apply plugin: 'org.jetbrains.intellij'
+intellij {
+    version 'IC-2016.3' //IntelliJ IDEA 2016.3 dependency; for a full list of IntelliJ IDEA releases please see https://www.jetbrains.com/intellij-repository/releases
+    plugins 'git4idea' //Bundled plugin dependencies
+    pluginName 'ReleaseChecklist'
+    updateSinceUntilBuild false
+}
+
+apply plugin: 'idea'
+
+group "com.intellij"
+version '0.1' // Plugin version

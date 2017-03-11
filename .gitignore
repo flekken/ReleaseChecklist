@@ -1,0 +1,26 @@
+# ---- Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ---- Mac OS X
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+
+# Gradle
+.gradle
+classes
+build
+out
+
+# ---- IntelliJ IDEA
+*.iws
+*.iml
+*.ipr
+.idea

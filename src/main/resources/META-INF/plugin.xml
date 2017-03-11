@@ -1,0 +1,41 @@
+<idea-plugin version="2">
+    <id>flekken.releasechecklist</id>
+    <name>ReleaseChecklist</name>
+    <version>0.1</version>
+    <vendor email="flekken@gmail.com" url="https://github.com/flekken/releasechecklist">Adam Vaszil</vendor>
+
+    <description><![CDATA[
+      Enter short description for your plugin here.<br>
+      <em>most HTML tags may be used</em>
+    ]]></description>
+
+    <change-notes><![CDATA[
+      Add change notes here.<br>
+      <em>most HTML tags may be used</em>
+    ]]>
+    </change-notes>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+    <idea-version since-build="141.0"/>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+         on how to target different products -->
+    <depends optional="false">Git4Idea</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Add your extensions here -->
+    </extensions>
+
+    <!-- DEFAULT ENTRY POINT -->
+    <project-components>
+        <component>
+            <implementation-class>flekken.releasechecklist.ReleaseChecklist</implementation-class>
+            <loadForDefaultProject/>
+        </component>
+    </project-components>
+
+    <actions>
+        <!-- Add your actions here -->
+    </actions>
+
+</idea-plugin>
