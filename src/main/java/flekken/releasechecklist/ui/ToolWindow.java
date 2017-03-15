@@ -29,7 +29,11 @@ public class ToolWindow implements ToolWindowFactory {
     private static final int POSITION_MERGE_MASTER_TO_DEV = 9;
     private static final int POSITION_PUSH_TO_DEV = 10;
 
-    private List<JCheckBox> checkBoxList;
+    private final List<JCheckBox> checkBoxList;
+
+    public ToolWindow() {
+        checkBoxList = new ArrayList<>(11);
+    }
 
     /**
      * This method is used to initialize the ui.
@@ -72,8 +76,6 @@ public class ToolWindow implements ToolWindowFactory {
             }
         });
         panel.add(newRelease, constraints);
-
-        checkBoxList = new ArrayList<>(11);
 
         CheckBoxBuilder checkBoxBuilder = new CheckBoxBuilder(panel, constraints);
 
