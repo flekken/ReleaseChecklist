@@ -197,7 +197,6 @@ public class ToolWindow implements ToolWindowFactory, Contract.View {
      */
     @Override
     public void init(com.intellij.openapi.wm.ToolWindow window) {
-        System.out.println("init");
     }
 
     @Override
@@ -215,7 +214,6 @@ public class ToolWindow implements ToolWindowFactory, Contract.View {
         checkBoxList.get(viewPositionToUpdate).setSelected(true);
         checkBoxList.get(viewPositionToUpdate + 1).setEnabled(true);
     }
-
 
     private static class CheckBoxBuilder {
 

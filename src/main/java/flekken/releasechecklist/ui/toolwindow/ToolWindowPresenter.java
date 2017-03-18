@@ -1,12 +1,18 @@
 package flekken.releasechecklist.ui.toolwindow;
 
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Key;
 import flekken.releasechecklist.bl.aheadbehind.AheadBehindCountFetcher;
 import git4idea.GitLocalBranch;
 import git4idea.GitUtil;
 import git4idea.GitVcs;
+import git4idea.commands.Git;
+import git4idea.commands.GitCommand;
+import git4idea.commands.GitLineHandler;
+import git4idea.commands.GitLineHandlerListener;
 import git4idea.repo.GitRepository;
 import git4idea.repo.GitRepositoryManager;
 import git4idea.update.GitFetchResult;
@@ -17,6 +23,9 @@ import org.jetbrains.annotations.NotNull;
  * Created by on 2017.03.18..
  */
 public class ToolWindowPresenter implements Contract.Presenter {
+
+    private static final String BRANCH_NAME_MASTER = "master";
+    private static final String BRANCH_NAME_DEVELOP = "develop";
 
     private Project project;
     private AheadBehindCountFetcher aheadBehindCountFetcher;
@@ -50,31 +59,66 @@ public class ToolWindowPresenter implements Contract.Presenter {
     }
 
     private void checkMergedDevelopToMaster() {
+        Git git = ServiceManager.getService(Git.class);
+        git.runCommand(() -> {
+            final GitLineHandler h = new GitLineHandler(repository.getProject(), repository.getRoot(),
+                    GitCommand.BRANCH);
+            h.setSilent(false);
+            h.setStdoutSuppressed(false);
+            h.addLineListener(new GitLineHandlerListener() {
+                @Override
+                public void onLineAvailable(String s, Key key) {
+                    if (s.contains(BRANCH_NAME_DEVELOP)) {
+                        view.check(Contract.View.POSITION_MERGED_DEV_TO_MASTER);
+                    }
+                }
 
+                @Override
+                public void processTerminated(int exitCode) {
+
+                }
+
+                @Override
+                public void startFailed(Throwable exception) {
+
+                }
+            });
+            h.addParameters("--merged");
+            h.addParameters(BRANCH_NAME_MASTER);
+            return h;
+        });
     }
 
     private void checkOnMaster() {
         GitLocalBranch currentBranch = repository.getCurrentBranch();
-        if (currentBranch != null && currentBranch.getName().equals("master")) {
+        if (currentBranch != null && currentBranch.getName().equals(BRANCH_NAME_MASTER)) {
             view.check(Contract.View.POSITION_ON_MASTER);
         }
     }
 
+    /**
+     * Develop branch should not be behind and ahead
+     */
     private void checkDevelopUpToDate() {
-        GitLocalBranch developBranch = repository.getBranches().findLocalBranch("develop");
-        checkBranchUpToDate(developBranch, Contract.View.POSITION_DEV_UP_TO_DATE);
-    }
-
-    private void checkMasterUpToDate() {
-        GitLocalBranch masterBranch = repository.getBranches().findLocalBranch("master");
-        checkBranchUpToDate(masterBranch, Contract.View.POSITION_MASTER_UP_TO_DATE);
-    }
-
-    private void checkBranchUpToDate(GitLocalBranch branch, int viewPositionToUpdate) {
-        if (branch != null) {
-            aheadBehindCountFetcher.get(branch, aheadBehindCount -> {
+        GitLocalBranch developBranch = repository.getBranches().findLocalBranch(BRANCH_NAME_DEVELOP);
+        if (developBranch != null) {
+            aheadBehindCountFetcher.get(developBranch, aheadBehindCount -> {
                 if (aheadBehindCount.ahead == 0 && aheadBehindCount.behind == 0) {
-                    view.check(viewPositionToUpdate);
+                    view.check(Contract.View.POSITION_DEV_UP_TO_DATE);
+                }
+            });
+        }
+    }
+
+    /**
+     * Master branch should not be behind
+     */
+    private void checkMasterUpToDate() {
+        GitLocalBranch masterBranch = repository.getBranches().findLocalBranch(BRANCH_NAME_MASTER);
+        if (masterBranch != null) {
+            aheadBehindCountFetcher.get(masterBranch, aheadBehindCount -> {
+                if (aheadBehindCount.behind == 0) {
+                    view.check(Contract.View.POSITION_MASTER_UP_TO_DATE);
                 }
             });
         }
