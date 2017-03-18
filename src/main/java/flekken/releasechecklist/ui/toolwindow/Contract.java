@@ -28,7 +28,9 @@ public class Contract {
         int POSITION_MERGE_MASTER_TO_DEV = 9;
         int POSITION_PUSH_TO_DEV = 10;
 
-        void check(int viewPositionToUpdate);
+        void check(int viewPosition);
+
+        boolean isChecked(int viewPosition);
     }
 
 }
