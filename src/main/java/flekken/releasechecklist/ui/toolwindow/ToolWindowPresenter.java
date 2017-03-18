@@ -165,10 +165,10 @@ public class ToolWindowPresenter implements Contract.Presenter {
                 checkMergedDevelopToMaster();
             }
             if (!view.isChecked(Contract.View.POSITION_COMMIT_VERSION)) {
-                //if version was commited
+                //TODO: check if version was commited
             }
             if (!view.isChecked(Contract.View.POSITION_TAG_COMMIT)) {
-                //if commit was tagged
+                //TODO: check if commit was tagged
             }
             if (!view.isChecked(Contract.View.POSITION_PUSH_MASTER) && view.isChecked(Contract.View.POSITION_TAG_COMMIT)) {
                 checkMasterNotAheadNotBehind();
