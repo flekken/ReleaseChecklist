@@ -152,31 +152,33 @@ public class ToolWindowPresenter implements Contract.Presenter {
 
     private GitRepositoryChangeListener getRepoChangeListener() {
         return repository -> {
-            if (!view.isChecked(Contract.View.POSITION_DEV_UP_TO_DATE)) {
+            if (view.isCheckable(Contract.View.POSITION_DEV_UP_TO_DATE)) {
                 checkDevelopUpToDate(Contract.View.POSITION_DEV_UP_TO_DATE);
             }
-            if (!view.isChecked(Contract.View.POSITION_MASTER_UP_TO_DATE)) {
+            if (view.isCheckable(Contract.View.POSITION_MASTER_UP_TO_DATE)) {
                 checkMasterNotBehind();
             }
-            if (!view.isChecked(Contract.View.POSITION_ON_MASTER)) {
+
+            //Check if we are on master until we build the release
+            if (!view.isChecked(Contract.View.POSITION_BUILD_RELEASE)) {
                 checkOnMaster();
             }
-            if (!view.isChecked(Contract.View.POSITION_MERGED_DEV_TO_MASTER)) {
+            if (view.isCheckable(Contract.View.POSITION_MERGED_DEV_TO_MASTER)) {
                 checkMergedDevelopToMaster();
             }
-            if (!view.isChecked(Contract.View.POSITION_COMMIT_VERSION)) {
+            if (view.isCheckable(Contract.View.POSITION_COMMIT_VERSION)) {
                 //TODO: check if version was commited
             }
-            if (!view.isChecked(Contract.View.POSITION_TAG_COMMIT)) {
+            if (view.isCheckable(Contract.View.POSITION_TAG_COMMIT)) {
                 //TODO: check if commit was tagged
             }
-            if (!view.isChecked(Contract.View.POSITION_PUSH_MASTER) && view.isChecked(Contract.View.POSITION_TAG_COMMIT)) {
+            if (view.isCheckable(Contract.View.POSITION_PUSH_MASTER)) {
                 checkMasterNotAheadNotBehind();
             }
-            if (!view.isChecked(Contract.View.POSITION_MERGE_MASTER_TO_DEV)) {
+            if (view.isCheckable(Contract.View.POSITION_MERGE_MASTER_TO_DEV)) {
                 checkMergedMasterToDevelop();
             }
-            if (!view.isChecked(Contract.View.POSITION_PUSH_TO_DEV) && view.isChecked(Contract.View.POSITION_MERGE_MASTER_TO_DEV)) {
+            if (view.isCheckable(Contract.View.POSITION_PUSH_TO_DEV)) {
                 checkDevelopUpToDate(Contract.View.POSITION_PUSH_TO_DEV);
             }
         };

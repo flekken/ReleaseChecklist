@@ -31,6 +31,8 @@ public class Contract {
         void check(int viewPosition);
 
         boolean isChecked(int viewPosition);
+
+        boolean isCheckable(int viewPosition);
     }
 
 }

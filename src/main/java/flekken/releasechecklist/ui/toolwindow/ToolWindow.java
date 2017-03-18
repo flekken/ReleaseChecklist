@@ -220,6 +220,11 @@ public class ToolWindow implements ToolWindowFactory, Contract.View {
         return checkBoxList.get(viewPosition).isSelected();
     }
 
+    @Override
+    public boolean isCheckable(int viewPosition) {
+        return checkBoxList.get(viewPosition).isEnabled() && !checkBoxList.get(viewPosition).isSelected();
+    }
+
     private static class CheckBoxBuilder {
 
         public final JPanel panel;
