@@ -65,34 +65,7 @@ public class ToolWindowPresenter implements Contract.Presenter {
     }
 
     private void checkMergedDevelopToMaster() {
-        Git git = ServiceManager.getService(Git.class);
-        git.runCommand(() -> {
-            final GitLineHandler h = new GitLineHandler(repository.getProject(), repository.getRoot(),
-                    GitCommand.BRANCH);
-            h.setSilent(false);
-            h.setStdoutSuppressed(false);
-            h.addLineListener(new GitLineHandlerListener() {
-                @Override
-                public void onLineAvailable(String s, Key key) {
-                    if (s.contains(BRANCH_NAME_DEVELOP)) {
-                        view.check(Contract.View.POSITION_MERGED_DEV_TO_MASTER);
-                    }
-                }
-
-                @Override
-                public void processTerminated(int exitCode) {
-
-                }
-
-                @Override
-                public void startFailed(Throwable exception) {
-
-                }
-            });
-            h.addParameters("--merged");
-            h.addParameters(BRANCH_NAME_MASTER);
-            return h;
-        });
+        checkMerge(Contract.View.POSITION_MERGED_DEV_TO_MASTER, BRANCH_NAME_MASTER, BRANCH_NAME_DEVELOP);
     }
 
     private void checkOnMaster() {
@@ -142,6 +115,41 @@ public class ToolWindowPresenter implements Contract.Presenter {
         }
     }
 
+    private void checkMergedMasterToDevelop() {
+        checkMerge(Contract.View.POSITION_MERGE_MASTER_TO_DEV, BRANCH_NAME_DEVELOP, BRANCH_NAME_MASTER);
+    }
+
+    private void checkMerge(int viewPosition, String branchToCheck, String branchToFind) {
+        Git git = ServiceManager.getService(Git.class);
+        git.runCommand(() -> {
+            final GitLineHandler h = new GitLineHandler(repository.getProject(), repository.getRoot(),
+                    GitCommand.BRANCH);
+            h.setSilent(false);
+            h.setStdoutSuppressed(false);
+            h.addLineListener(new GitLineHandlerListener() {
+                @Override
+                public void onLineAvailable(String s, Key key) {
+                    if (s.contains(branchToFind)) {
+                        view.check(viewPosition);
+                    }
+                }
+
+                @Override
+                public void processTerminated(int exitCode) {
+
+                }
+
+                @Override
+                public void startFailed(Throwable exception) {
+
+                }
+            });
+            h.addParameters("--merged");
+            h.addParameters(branchToCheck);
+            return h;
+        });
+    }
+
     private GitRepositoryChangeListener getRepoChangeListener() {
         return repository -> {
             if (!view.isChecked(Contract.View.POSITION_DEV_UP_TO_DATE)) {
@@ -166,7 +174,7 @@ public class ToolWindowPresenter implements Contract.Presenter {
                 checkMasterNotAheadNotBehind();
             }
             if (!view.isChecked(Contract.View.POSITION_MERGE_MASTER_TO_DEV)) {
-                //if master merged to develop
+                checkMergedMasterToDevelop();
             }
             if (!view.isChecked(Contract.View.POSITION_PUSH_TO_DEV)) {
                 //if develop is not behind
