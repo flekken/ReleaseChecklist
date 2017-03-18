@@ -14,6 +14,7 @@ import git4idea.commands.GitCommand;
 import git4idea.commands.GitLineHandler;
 import git4idea.commands.GitLineHandlerListener;
 import git4idea.repo.GitRepository;
+import git4idea.repo.GitRepositoryChangeListener;
 import git4idea.repo.GitRepositoryManager;
 import git4idea.update.GitFetchResult;
 import git4idea.update.GitFetcher;
@@ -32,13 +33,18 @@ public class ToolWindowPresenter implements Contract.Presenter {
     private GitRepository repository;
     private Contract.View view;
 
+    private final GitRepositoryChangeListener changeListener = getRepoChangeListener();
+
     @Override
     public void attach(Project project, Contract.View view) {
         this.view = view;
         this.project = project;
+
         GitRepositoryManager repositoryManager = GitUtil.getRepositoryManager(project);
         this.repository = repositoryManager.getRepositories().get(0);
         this.aheadBehindCountFetcher = new AheadBehindCountFetcher(project, repository);
+
+        this.project.getMessageBus().connect().subscribe(GitRepository.GIT_REPO_CHANGE, changeListener);
     }
 
     @Override
@@ -122,5 +128,23 @@ public class ToolWindowPresenter implements Contract.Presenter {
                 }
             });
         }
+    }
+
+    private GitRepositoryChangeListener getRepoChangeListener() {
+        return new GitRepositoryChangeListener() {
+            @Override
+            public void repositoryChanged(@NotNull GitRepository repository) {
+                //check these if the checkbox is unchecked
+
+                //if develop is up-to date
+                //if master is up-to-date
+                //is on master
+                //if version was commited
+                //if commit was tagged
+                //if master is not behind
+                //if master merged to develop
+                //if develop is not behind
+            }
+        };
     }
 }
