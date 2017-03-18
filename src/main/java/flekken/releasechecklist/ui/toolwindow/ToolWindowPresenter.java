@@ -19,6 +19,7 @@ import git4idea.repo.GitRepositoryManager;
 import git4idea.update.GitFetchResult;
 import git4idea.update.GitFetcher;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Created by on 2017.03.18..
@@ -55,10 +56,10 @@ public class ToolWindowPresenter implements Contract.Presenter {
                 GitFetcher fetcher = new GitFetcher(project, indicator, true);
                 GitFetchResult result = fetcher.fetch(repository);
                 if (result.isSuccess()) {
+                    //run them sequentially
+                    //aheadBehind counter lock the thread so they are sequential
                     checkDevelopUpToDate(Contract.View.POSITION_DEV_UP_TO_DATE);
-                    checkMasterNotBehind();
-                    checkOnMaster();
-                    checkMergedDevelopToMaster();
+                    checkMasterNotBehind(() -> checkOnMaster(() -> checkMergedDevelopToMaster()));
                 }
             }
         });
@@ -68,10 +69,13 @@ public class ToolWindowPresenter implements Contract.Presenter {
         checkMerge(Contract.View.POSITION_MERGED_DEV_TO_MASTER, BRANCH_NAME_MASTER, BRANCH_NAME_DEVELOP);
     }
 
-    private void checkOnMaster() {
+    private void checkOnMaster(@Nullable Callback callback) {
         GitLocalBranch currentBranch = repository.getCurrentBranch();
         if (currentBranch != null && currentBranch.getName().equals(BRANCH_NAME_MASTER)) {
             view.check(Contract.View.POSITION_ON_MASTER);
+            if (callback != null) {
+                callback.onComplete();
+            }
         }
     }
 
@@ -92,17 +96,19 @@ public class ToolWindowPresenter implements Contract.Presenter {
     /**
      * Master branch should not be behind
      */
-    private void checkMasterNotBehind() {
+    private void checkMasterNotBehind(@Nullable Callback callback) {
         GitLocalBranch masterBranch = repository.getBranches().findLocalBranch(BRANCH_NAME_MASTER);
         if (masterBranch != null) {
             aheadBehindCountFetcher.get(masterBranch, aheadBehindCount -> {
                 if (aheadBehindCount.behind == 0) {
                     view.check(Contract.View.POSITION_MASTER_UP_TO_DATE);
+                    if (callback != null) {
+                        callback.onComplete();
+                    }
                 }
             });
         }
     }
-
 
     private void checkMasterNotAheadNotBehind() {
         GitLocalBranch masterBranch = repository.getBranches().findLocalBranch(BRANCH_NAME_MASTER);
@@ -156,12 +162,12 @@ public class ToolWindowPresenter implements Contract.Presenter {
                 checkDevelopUpToDate(Contract.View.POSITION_DEV_UP_TO_DATE);
             }
             if (view.isCheckable(Contract.View.POSITION_MASTER_UP_TO_DATE)) {
-                checkMasterNotBehind();
+                checkMasterNotBehind(null);
             }
 
             //Check if we are on master until we build the release
             if (!view.isChecked(Contract.View.POSITION_BUILD_RELEASE)) {
-                checkOnMaster();
+                checkOnMaster(null);
             }
             if (view.isCheckable(Contract.View.POSITION_MERGED_DEV_TO_MASTER)) {
                 checkMergedDevelopToMaster();
@@ -182,5 +188,9 @@ public class ToolWindowPresenter implements Contract.Presenter {
                 checkDevelopUpToDate(Contract.View.POSITION_PUSH_TO_DEV);
             }
         };
+    }
+
+    private interface Callback {
+        void onComplete();
     }
 }
