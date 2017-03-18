@@ -55,7 +55,7 @@ public class ToolWindowPresenter implements Contract.Presenter {
                 GitFetcher fetcher = new GitFetcher(project, indicator, true);
                 GitFetchResult result = fetcher.fetch(repository);
                 if (result.isSuccess()) {
-                    checkDevelopUpToDate();
+                    checkDevelopUpToDate(Contract.View.POSITION_DEV_UP_TO_DATE);
                     checkMasterNotBehind();
                     checkOnMaster();
                     checkMergedDevelopToMaster();
@@ -78,12 +78,12 @@ public class ToolWindowPresenter implements Contract.Presenter {
     /**
      * Develop branch should not be behind and ahead
      */
-    private void checkDevelopUpToDate() {
+    private void checkDevelopUpToDate(int viewPosition) {
         GitLocalBranch developBranch = repository.getBranches().findLocalBranch(BRANCH_NAME_DEVELOP);
         if (developBranch != null) {
             aheadBehindCountFetcher.get(developBranch, aheadBehindCount -> {
                 if (aheadBehindCount.ahead == 0 && aheadBehindCount.behind == 0) {
-                    view.check(Contract.View.POSITION_DEV_UP_TO_DATE);
+                    view.check(viewPosition);
                 }
             });
         }
@@ -153,7 +153,7 @@ public class ToolWindowPresenter implements Contract.Presenter {
     private GitRepositoryChangeListener getRepoChangeListener() {
         return repository -> {
             if (!view.isChecked(Contract.View.POSITION_DEV_UP_TO_DATE)) {
-                checkDevelopUpToDate();
+                checkDevelopUpToDate(Contract.View.POSITION_DEV_UP_TO_DATE);
             }
             if (!view.isChecked(Contract.View.POSITION_MASTER_UP_TO_DATE)) {
                 checkMasterNotBehind();
@@ -176,8 +176,8 @@ public class ToolWindowPresenter implements Contract.Presenter {
             if (!view.isChecked(Contract.View.POSITION_MERGE_MASTER_TO_DEV)) {
                 checkMergedMasterToDevelop();
             }
-            if (!view.isChecked(Contract.View.POSITION_PUSH_TO_DEV)) {
-                //if develop is not behind
+            if (!view.isChecked(Contract.View.POSITION_PUSH_TO_DEV) && view.isChecked(Contract.View.POSITION_MERGE_MASTER_TO_DEV)) {
+                checkDevelopUpToDate(Contract.View.POSITION_PUSH_TO_DEV);
             }
         };
     }
