@@ -7,9 +7,6 @@ import com.intellij.openapi.vcs.roots.VcsRootDetector;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
-import flekken.releasechecklist.bl.GitManager;
-import git4idea.repo.GitRepository;
-import git4idea.repo.GitRepositoryChangeListener;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -24,11 +21,8 @@ import java.util.List;
  */
 public class ToolWindow implements ToolWindowFactory, Contract.View {
 
-
     private final List<JCheckBox> checkBoxList;
     private final Contract.Presenter toolWindowPresenter;
-
-    private final GitRepositoryChangeListener repoListener = GitManager.createRepoListener();
 
     public ToolWindow() {
         checkBoxList = new ArrayList<>(11);
@@ -43,8 +37,6 @@ public class ToolWindow implements ToolWindowFactory, Contract.View {
     public void createToolWindowContent(@NotNull Project project, @NotNull com.intellij.openapi.wm.ToolWindow toolWindow) {
         Collection<VcsRoot> vcsRoots = ServiceManager.getService(project, VcsRootDetector.class).detect();
         if (vcsRoots.size() > 0) {
-            project.getMessageBus().connect().subscribe(GitRepository.GIT_REPO_CHANGE, repoListener);
-
             ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
             Content content = contentFactory.createContent(initLayout(), "", true);
             toolWindow.getContentManager().addContent(content);
