@@ -134,16 +134,33 @@ public class ToolWindowPresenter implements Contract.Presenter {
         return new GitRepositoryChangeListener() {
             @Override
             public void repositoryChanged(@NotNull GitRepository repository) {
-                //check these if the checkbox is unchecked
-
-                //if develop is up-to date
-                //if master is up-to-date
-                //is on master
-                //if version was commited
-                //if commit was tagged
-                //if master is not behind
-                //if master merged to develop
-                //if develop is not behind
+                if (view.isChecked(Contract.View.POSITION_DEV_UP_TO_DATE)) {
+                    checkDevelopUpToDate();
+                }
+                if (view.isChecked(Contract.View.POSITION_MASTER_UP_TO_DATE)) {
+                    checkMasterUpToDate();
+                }
+                if (view.isChecked(Contract.View.POSITION_ON_MASTER)) {
+                    checkOnMaster();
+                }
+                if (view.isChecked(Contract.View.POSITION_MERGED_DEV_TO_MASTER)) {
+                    checkMergedDevelopToMaster();
+                }
+                if (view.isChecked(Contract.View.POSITION_COMMIT_VERSION)) {
+                    //if version was commited
+                }
+                if (view.isChecked(Contract.View.POSITION_TAG_COMMIT)) {
+                    //if commit was tagged
+                }
+                if (view.isChecked(Contract.View.POSITION_PUSH_MASTER)) {
+                    //if master is not behind
+                }
+                if (view.isChecked(Contract.View.POSITION_MERGE_MASTER_TO_DEV)) {
+                    //if master merged to develop
+                }
+                if (view.isChecked(Contract.View.POSITION_PUSH_TO_DEV)) {
+                    //if develop is not behind
+                }
             }
         };
     }
