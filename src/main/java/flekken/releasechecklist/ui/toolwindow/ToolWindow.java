@@ -1,38 +1,38 @@
-package flekken.releasechecklist.ui;
+package flekken.releasechecklist.ui.toolwindow;
 
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vcs.VcsRoot;
+import com.intellij.openapi.vcs.roots.VcsRootDetector;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
+import flekken.releasechecklist.bl.GitManager;
+import git4idea.repo.GitRepository;
+import git4idea.repo.GitRepositoryChangeListener;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
  * Created by on 2017.03.11..
  */
-public class ToolWindow implements ToolWindowFactory {
+public class ToolWindow implements ToolWindowFactory, Contract.View {
 
-    private static final int POSITION_DEV_UP_TO_DATE = 0;
-    private static final int POSITION_MASTER_UP_TO_DATE = 1;
-    private static final int POSITION_MERGED_DEV_TO_MASTER = 2;
-    private static final int POSITION_ON_MASTER = 3;
-    private static final int POSITION_INCREASE_VERSION = 4;
-    private static final int POSITION_COMMIT_VERSION = 5;
-    private static final int POSITION_TAG_COMMIT = 6;
-    private static final int POSITION_BUILD_RELEASE = 7;
-    private static final int POSITION_PUSH_MASTER = 8;
-    private static final int POSITION_MERGE_MASTER_TO_DEV = 9;
-    private static final int POSITION_PUSH_TO_DEV = 10;
 
     private final List<JCheckBox> checkBoxList;
+    private final Contract.Presenter toolWindowPresenter;
+
+    private final GitRepositoryChangeListener repoListener = GitManager.createRepoListener();
 
     public ToolWindow() {
         checkBoxList = new ArrayList<>(11);
+        toolWindowPresenter = new ToolWindowPresenter();
     }
 
     /**
@@ -41,9 +41,16 @@ public class ToolWindow implements ToolWindowFactory {
      */
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull com.intellij.openapi.wm.ToolWindow toolWindow) {
-        ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-        Content content = contentFactory.createContent(initLayout(), "", true);
-        toolWindow.getContentManager().addContent(content);
+        Collection<VcsRoot> vcsRoots = ServiceManager.getService(project, VcsRootDetector.class).detect();
+        if (vcsRoots.size() > 0) {
+            project.getMessageBus().connect().subscribe(GitRepository.GIT_REPO_CHANGE, repoListener);
+
+            ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
+            Content content = contentFactory.createContent(initLayout(), "", true);
+            toolWindow.getContentManager().addContent(content);
+
+            toolWindowPresenter.attach(project, this);
+        }
     }
 
     private JScrollPane initLayout() {
@@ -74,6 +81,7 @@ public class ToolWindow implements ToolWindowFactory {
                 }
                 checkBox.setSelected(false);
             }
+            toolWindowPresenter.onReleasePressed();
         });
         panel.add(newRelease, constraints);
 
@@ -95,16 +103,16 @@ public class ToolWindow implements ToolWindowFactory {
 
         checkBoxList.add(checkBoxBuilder
                 .row(checkBoxList.size() + 1)
-                .label("Merge develop to master")
+                .label("On master")
                 .enabled(false)
-                .listener(l -> setCheckboxesState(POSITION_MERGED_DEV_TO_MASTER))
+                .listener(l -> setCheckboxesState(POSITION_ON_MASTER))
                 .build());
 
         checkBoxList.add(checkBoxBuilder
                 .row(checkBoxList.size() + 1)
-                .label("On master")
+                .label("Merge develop to master")
                 .enabled(false)
-                .listener(l -> setCheckboxesState(POSITION_ON_MASTER))
+                .listener(l -> setCheckboxesState(POSITION_MERGED_DEV_TO_MASTER))
                 .build());
 
         checkBoxList.add(checkBoxBuilder
@@ -208,6 +216,12 @@ public class ToolWindow implements ToolWindowFactory {
     @Override
     public boolean isDoNotActivateOnStart() {
         return true;
+    }
+
+    @Override
+    public void check(int viewPositionToUpdate) {
+        checkBoxList.get(viewPositionToUpdate).setSelected(true);
+        checkBoxList.get(viewPositionToUpdate + 1).setEnabled(true);
     }
 
 

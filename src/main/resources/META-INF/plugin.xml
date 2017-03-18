@@ -23,15 +23,12 @@
     <depends optional="false">Git4Idea</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow id="Release Checklist" anchor="right" factoryClass="flekken.releasechecklist.ui.ToolWindow"/>
+        <toolWindow id="Release Checklist" anchor="right"
+                    factoryClass="flekken.releasechecklist.ui.toolwindow.ToolWindow"/>
     </extensions>
 
     <!-- DEFAULT ENTRY POINT -->
     <project-components>
-        <component>
-            <implementation-class>flekken.releasechecklist.ReleaseChecklist</implementation-class>
-            <loadForDefaultProject/>
-        </component>
     </project-components>
 
     <actions>
