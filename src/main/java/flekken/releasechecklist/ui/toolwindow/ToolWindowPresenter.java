@@ -59,7 +59,9 @@ public class ToolWindowPresenter implements Contract.Presenter {
                     //run them sequentially
                     //aheadBehind counter lock the thread so they are sequential
                     checkDevelopUpToDate(Contract.View.POSITION_DEV_UP_TO_DATE);
-                    checkMasterNotBehind(() -> checkOnMaster(() -> checkMergedDevelopToMaster()));
+                    if (view.isChecked(Contract.View.POSITION_DEV_UP_TO_DATE)) {
+                        checkMasterNotBehind(() -> checkOnMaster(() -> checkMergedDevelopToMaster()));
+                    }
                 }
             }
         });
