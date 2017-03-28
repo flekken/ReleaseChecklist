@@ -1,17 +1,15 @@
-<idea-plugin version="2">
+<idea-plugin>
     <id>flekken.releasechecklist</id>
     <name>ReleaseChecklist</name>
-    <version>0.1</version>
+    <version>1.0.0</version>
     <vendor email="flekken@gmail.com" url="https://github.com/flekken/releasechecklist">Adam Vaszil</vendor>
 
     <description><![CDATA[
-      Enter short description for your plugin here.<br>
-      <em>most HTML tags may be used</em>
+      Adds a checklist to the right toolbar for guiding the developer through the release of an Android application.
     ]]></description>
 
     <change-notes><![CDATA[
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>
+     First Release
     ]]>
     </change-notes>
 
