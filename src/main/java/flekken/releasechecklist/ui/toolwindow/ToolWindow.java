@@ -212,7 +212,9 @@ public class ToolWindow implements ToolWindowFactory, Contract.View {
     @Override
     public void check(int viewPosition) {
         checkBoxList.get(viewPosition).setSelected(true);
-        checkBoxList.get(viewPosition + 1).setEnabled(true);
+        if (viewPosition + 1 != checkBoxList.size()) {
+            checkBoxList.get(viewPosition + 1).setEnabled(true);
+        }
     }
 
     @Override
