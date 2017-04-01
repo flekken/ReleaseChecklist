@@ -25,4 +25,4 @@ intellij {
 apply plugin: 'idea'
 
 group "com.intellij"
-version '1.0.0' // Plugin version
+version '1.0.1' // Plugin version
